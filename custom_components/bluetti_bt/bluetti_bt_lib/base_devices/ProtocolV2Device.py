@@ -67,3 +67,9 @@ class ProtocolV2Device(BluettiDevice):
     @property
     def pack_polling_commands(self) -> List[ReadHoldingRegisters]:
         return []
+
+    @property
+    def read_sn_command(self) -> List[ReadHoldingRegisters]:
+        return [
+            ReadHoldingRegisters(116, 4)
+        ]

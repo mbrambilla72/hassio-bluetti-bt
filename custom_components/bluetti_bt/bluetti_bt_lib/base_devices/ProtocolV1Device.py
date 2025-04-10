@@ -64,3 +64,9 @@ class ProtocolV1Device(BluettiDevice):
         return [
             ReadHoldingRegisters(96, 1),
         ]
+
+    @property
+    def read_sn_command(self) -> List[ReadHoldingRegisters]:
+        return [
+            ReadHoldingRegisters(17, 4)
+        ]

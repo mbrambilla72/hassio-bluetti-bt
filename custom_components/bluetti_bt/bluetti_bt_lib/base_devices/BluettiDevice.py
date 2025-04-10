@@ -39,6 +39,11 @@ class BluettiDevice:
         return []
 
     @property
+    def read_sn_command(self) -> List[ReadHoldingRegisters]:
+        """read bluetti device serial number"""
+        return []
+
+    @property
     def writable_ranges(self) -> List[range]:
         """The address ranges that are writable"""
         return []

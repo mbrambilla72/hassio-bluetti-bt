@@ -146,8 +146,9 @@ class SerialNumberField(DeviceField):
 class DeviceStruct:
     fields: List[DeviceField]
 
-    def __init__(self):
+    def __init__(self, slave_addr: int = 1):
         self.fields = []
+        self.slave_addr = slave_addr
 
     def add_uint_field(self, name: str, address: int, range: Tuple[int, int] = None, multiplier: float = 1):
         self.fields.append(UintField(name, address, range, multiplier))
@@ -204,10 +205,10 @@ class DeviceStruct:
             # Create a new group if there's a gap 
             # in the addresses.
             if address >= last + tolerance:
-                commands.append(ReadHoldingRegisters(start, last - start + 1))
+                commands.append(ReadHoldingRegisters(start, last - start + 1, self.slave_addr))
                 start = address
             last = address
-        commands.append(ReadHoldingRegisters(start, last - start + 1))    
+        commands.append(ReadHoldingRegisters(start, last - start + 1, self.slave_addr))    
         return commands
 
     def parse(self, starting_address: int, data: bytes) -> dict:

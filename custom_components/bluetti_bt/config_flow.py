@@ -49,7 +49,7 @@ class BluettiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
 
         if isinstance(discovery_info.name, str):
-            name = re.sub("[^A-Z0-9]+", "", discovery_info.name)
+            name = re.sub("[^A-Z0-9a-z]+", "", discovery_info.name)
             discovery_info.manufacturer_data = {
                 CONF_TYPE: get_type_by_bt_name(name)
             }
@@ -78,7 +78,7 @@ class BluettiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             discovery_info = self._discovered_devices[address]
             await self.async_set_unique_id(address, raise_on_progress=False)
             self._abort_if_unique_id_configured()
-            name = re.sub("[^A-Z0-9]+", "", discovery_info.name)
+            name = re.sub("[^A-Z0-9a-z]+", "", discovery_info.name)
 
             return self.async_create_entry(
                 title=name,
