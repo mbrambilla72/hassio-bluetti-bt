@@ -76,41 +76,10 @@ class AC2A(ProtocolV2Device):
         self.struct.add_uint_field('pack_battery_percent', 6113)
         self.struct.add_version_field('bcu_version', 6175)
 
-    #@property
-    #def polling_commands(self) -> List[ReadHoldingRegisters]:
-    #    return self.struct.get_read_holding_registers()
-    
     @property
     def polling_commands(self) -> List[ReadHoldingRegisters]:
-        return [
-            ReadHoldingRegisters(100, 50),
-            ReadHoldingRegisters(1100, 51),
-            ReadHoldingRegisters(1200, 90),
-            ReadHoldingRegisters(1300, 31),
-            ReadHoldingRegisters(1400, 48),
-            ReadHoldingRegisters(1500, 30),
-            ReadHoldingRegisters(2000, 67),
-            ReadHoldingRegisters(2200, 29),
-            ReadHoldingRegisters(6000, 31),
-            ReadHoldingRegisters(6100, 100),
-            ReadHoldingRegisters(6300, 52),
-        ]
-
-    @property
-    def logging_commands(self) -> List[ReadHoldingRegisters]:
-        return [
-            ReadHoldingRegisters(100, 50),
-            ReadHoldingRegisters(1100, 51),
-            ReadHoldingRegisters(1200, 90),
-            ReadHoldingRegisters(1300, 31),
-            ReadHoldingRegisters(1400, 48),
-            ReadHoldingRegisters(1500, 30),
-            ReadHoldingRegisters(2000, 67),
-            ReadHoldingRegisters(2200, 29),
-            ReadHoldingRegisters(6000, 31),
-            ReadHoldingRegisters(6100, 100),
-            ReadHoldingRegisters(6300, 52),
-        ]
+        return self.struct.get_read_holding_registers()
+    
 
     @property
     def writable_ranges(self) -> List[range]:
