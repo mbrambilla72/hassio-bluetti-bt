@@ -16,6 +16,13 @@ After the installation, you can use this button to install the integration:
 
 ### Supported devices:
 
+**************************************
+* NOT TESTED 
+********************************************
+
+I have home assistant on a arm64 machine. 
+No arm64 version compiled available on https://github.com/bluetti-official/bluetti-bluetooth-lib/releases/tag/1.0.0 only windows and linux x86_64.
+
 - AC2A 
 - AC60 (tested with one external battery B80)
 - AC60P (untested)
