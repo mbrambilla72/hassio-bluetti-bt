@@ -1,3 +1,6 @@
+Updated with experimental Elite 200 V2 support from encryption branch and https://github.com/Patrick762/hassio-bluetti-bt/pull/184.
+Updated with experimental AC2A support from encryption branch 
+
 # hassio-bluetti-bt
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 [![Validate with hassfest](https://github.com/Patrick762/hassio-bluetti-bt/actions/workflows/hassfest_validation.yml/badge.svg)](https://github.com/Patrick762/hassio-bluetti-bt/actions/workflows/hassfest_validation.yml)
@@ -12,7 +15,7 @@ This integration is provided without any warranty or support by Bluetti (unfortu
 To install this integration, you first need [HACS](https://hacs.xyz/) installed.
 After the installation, you can use this button to install the integration:
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Patrick762&repository=hassio-bluetti-bt&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=astaunton&repository=hassio-bluetti-bt&category=integration)
 
 ### Supported devices:
 
@@ -33,6 +36,7 @@ After the installation, you can use this button to install the integration:
 - EP600 (tested)
 - EP760 (basic data)
 - EP800 (basic data)
+- Elite 200 V2 (basic data)
 
 ### Available controls:
 If enabled in the Integration options (you need to reload the integration if you change this option):

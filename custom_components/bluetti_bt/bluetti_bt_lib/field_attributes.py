@@ -223,6 +223,7 @@ FIELD_ATTRIBUTES: dict[str, FieldAttributes] = {
     "ac_output_voltage_phase2": VoltageFieldAttributes("AC Output Voltage Phase 2"),
     "ac_output_voltage_phase3": VoltageFieldAttributes("AC Output Voltage Phase 3"),
     "total_ac_consumption": EnergyFieldAttributes("Total Load Consumption"),
+    "total_dc_consumption": EnergyFieldAttributes("Total DC Load Consumption"),
     "total_grid_consumption": EnergyFieldAttributes("Total Grid Consumption"),
     "total_grid_feed": EnergyFieldAttributes("Total Grid Feed"),
 

@@ -15,7 +15,8 @@
         { "local_name": "EP600*" },
         { "local_name": "EP760*" },
         { "local_name": "EP800*" },
-        { "local_name": "PBOX*" }
+        { "local_name": "PBOX*" },
+        { "local_name": "Elite 200 V2*"}
     ],
     "codeowners": ["@Patrick762"],
     "config_flow": true,
@@ -25,5 +26,5 @@
     "iot_class": "local_polling",
     "issue_tracker": "https://github.com/Patrick762/hassio-bluetti-bt/issues",
     "requirements": [],
-    "version": "0.1.4"
+    "version": "0.1.5"
 }
