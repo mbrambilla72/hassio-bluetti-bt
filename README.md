@@ -1,4 +1,3 @@
-Updated with experimental Elite 200 V2 support from encryption branch and https://github.com/Patrick762/hassio-bluetti-bt/pull/184.
 Updated with experimental AC2A support from encryption branch 
 
 # hassio-bluetti-bt
@@ -36,7 +35,7 @@ After the installation, you can use this button to install the integration:
 - EP600 (tested)
 - EP760 (basic data)
 - EP800 (basic data)
-- Elite 200 V2 (basic data)
+
 
 ### Available controls:
 If enabled in the Integration options (you need to reload the integration if you change this option):
