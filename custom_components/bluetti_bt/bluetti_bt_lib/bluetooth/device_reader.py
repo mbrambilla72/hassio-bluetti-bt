@@ -71,7 +71,7 @@ class DeviceReader:
                     for attempt in range(1, self.max_retries + 1):
                         try:
                             if not self.client.is_connected:
-                                await self.client.connect()
+                                await self.client.establish_connection()
                             break
                         except Exception as e:
                             if attempt == self.max_retries:
