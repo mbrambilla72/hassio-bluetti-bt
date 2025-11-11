@@ -25,6 +25,7 @@ from .const import (
     DOMAIN,
     MANUFACTURER,
 )
+from .bluetti_bt_lib.const import NOTIFY_UUID
 from .coordinator import PollingCoordinator
 
 PLATFORMS: List[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
@@ -75,6 +76,40 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    _LOGGER.debug("Unloading Bluetti BT Integration")
+
+    # Determine which platforms were loaded
+    use_controls = entry.data.get(CONF_USE_CONTROLS)
+    platforms: list = PLATFORMS.copy()
+    if use_controls is True:
+        platforms.append(Platform.SWITCH)
+
+    # Unload platforms
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, platforms)
+
+    if unload_ok:
+        # Stop coordinator
+        coordinator = hass.data[DOMAIN][entry.entry_id].get(DATA_COORDINATOR)
+        if coordinator:
+            # Disconnect from device if persistent connection was used
+            if coordinator.reader and coordinator.reader.client:
+                try:
+                    if coordinator.reader.client.is_connected:
+                        if coordinator.reader.has_notifier:
+                            await coordinator.reader.client.stop_notify(NOTIFY_UUID)
+                            coordinator.reader.has_notifier = False
+                        await coordinator.reader.client.disconnect()
+                        _LOGGER.debug("Disconnected from device")
+                except Exception as e:
+                    _LOGGER.warning("Error disconnecting from device: %s", e)
+        
+        # Remove data
+        hass.data[DOMAIN].pop(entry.entry_id)
+    
+    _LOGGER.debug("Unload complete: %s", unload_ok)
+    return unload_ok
 
 def device_info(entry: ConfigEntry) -> DeviceInfo:
     """Device info."""
