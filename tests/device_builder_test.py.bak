@@ -30,13 +30,16 @@ class TestDeviceBuilder(unittest.TestCase):
         bt_name = "PBOX56786746478"
         with self.assertRaises(TypeError):
             build_device(bt_addr, bt_name)
-
     def _test_device_build(self, bt_name, cls):
         bt_addr = "aa:bb:cc:dd:ee:ff"
         built = build_device(bt_addr, bt_name)
 
         self.assertIsInstance(built, cls)
         self.assertEqual(built.address, bt_addr)
+    def test_build_ac2a(self):
+        bt_addr = "aa:bb:cc:dd:ee:ff"
+        bt_name = "AC2A56786746478"
+        built = build_device(bt_addr, bt_name)
 
     def test_build_ac2a(self):
         self._test_device_build("AC2A56786746478", AC2A)

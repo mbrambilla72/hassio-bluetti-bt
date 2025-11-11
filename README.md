@@ -18,7 +18,7 @@ After the installation, you can use this button to install the integration:
 
 ### Supported devices:
 
-- AC2A 
+- AC2A
 - AC60 (tested with one external battery B80)
 - AC60P (untested)
 - AC70 (basic data)
@@ -27,15 +27,15 @@ After the installation, you can use this button to install the integration:
 - AC180P (tested)
 - AC200L (untested)
 - AC200M
+- AC200PL (untested)
 - AC300 (tested)
 - AC500 (tested)
 - EB3A
 - EP500
 - EP500P
 - EP600 (tested)
-- EP760 (basic data)
+- EP760 
 - EP800 (basic data)
-
 
 ### Available controls:
 If enabled in the Integration options (you need to reload the integration if you change this option):
