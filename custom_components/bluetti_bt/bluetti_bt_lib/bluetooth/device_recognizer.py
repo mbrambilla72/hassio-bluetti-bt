@@ -4,7 +4,7 @@ import asyncio
 import logging
 from typing import Any, Callable
 from bleak import BleakClient
-
+from bleak.backends.device import BLEDevice
 from custom_components.bluetti_bt.bluetti_bt_lib.utils.commands import (
     ReadHoldingRegisters,
 )
@@ -18,13 +18,21 @@ _LOGGER = logging.getLogger(__name__)
 async def recognize_device(
     bleak_client: BleakClient,
     future_builder_method: Callable[[], asyncio.Future[Any]],
+    ble_device: BLEDevice | None = None,
+    device_name: str | None = None,    
 ) -> str:
 
     # Since we don't know the type we use the base device
     bluetti_device = ProtocolV2Device("Unknown", "Unknown", "Unknown")
 
     # Create device builder
-    device_reader = DeviceReader(bleak_client, bluetti_device, future_builder_method)
+    device_reader = DeviceReader(
+        bleak_client,
+        bluetti_device,
+        future_builder_method,
+        ble_device=ble_device,
+        device_name=device_name,
+    )
 
     # Retry a few times to get data
     for _ in range(1, 50):

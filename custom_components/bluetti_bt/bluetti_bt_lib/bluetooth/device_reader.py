@@ -5,7 +5,11 @@ import logging
 from typing import Any, Callable, List, cast
 import async_timeout
 from bleak import BleakClient, BleakError
-
+from bleak.backends.device import BLEDevice
+from bleak_retry_connector import (
+    BleakClientWithServiceCache,
+    establish_connection,
+)
 from custom_components.bluetti_bt.bluetti_bt_lib.bluetooth.encryption import BluettiEncryption, Message, MessageType
 
 from ..base_devices.BluettiDevice import BluettiDevice
@@ -22,6 +26,8 @@ class DeviceReader:
         bleak_client: BleakClient,
         bluetti_device: BluettiDevice,
         future_builder_method: Callable[[], asyncio.Future[Any]],
+        ble_device: BLEDevice | None = None,
+        device_name: str | None = None,        
         persistent_conn: bool = False,
         polling_timeout: int = 45,
         max_retries: int = 5,
@@ -30,6 +36,9 @@ class DeviceReader:
         self.client = bleak_client
         self.bluetti_device = bluetti_device
         self.create_future = future_builder_method
+                # BLE device info used to establish connections with retry logic
+        self.ble_device = ble_device
+        self.device_name = device_name or getattr(ble_device, "name", None) or "Bluetti"
         self.persistent_conn = persistent_conn
         self.polling_timeout = polling_timeout
         self.max_retries = max_retries
@@ -71,7 +80,17 @@ class DeviceReader:
                     for attempt in range(1, self.max_retries + 1):
                         try:
                             if not self.client.is_connected:
-                                await self.client.connect()
+                                # Use bleak-retry-connector to establish a reliable connection
+                                if self.ble_device is None:
+                                    raise BleakError(
+                                        "BLEDevice is not provided; cannot establish connection reliably"
+                                    )
+                                self.client = await establish_connection(
+                                    BleakClientWithServiceCache,
+                                    self.ble_device,
+                                    self.device_name,
+                                    max_attempts=self.max_retries,
+                                )
                             break
                         except Exception as e:
                             if attempt == self.max_retries:

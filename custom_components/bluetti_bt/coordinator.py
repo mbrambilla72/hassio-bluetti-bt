@@ -58,6 +58,8 @@ class PollingCoordinator(DataUpdateCoordinator):
             client,
             bluetti_device,
             self.hass.loop.create_future,
+            ble_device=device,
+            device_name=device.name or device_name,            
             persistent_conn=persistent_conn,
             polling_timeout=polling_timeout,
             max_retries=max_retries,
