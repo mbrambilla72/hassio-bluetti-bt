@@ -36,7 +36,7 @@ class DeviceReader:
         self.client = bleak_client
         self.bluetti_device = bluetti_device
         self.create_future = future_builder_method
-                # BLE device info used to establish connections with retry logic
+        # BLE device info used to establish connections with retry logic
         self.ble_device = ble_device
         self.device_name = device_name or getattr(ble_device, "name", None) or "Bluetti"
         self.persistent_conn = persistent_conn

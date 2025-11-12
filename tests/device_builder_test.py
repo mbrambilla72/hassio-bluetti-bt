@@ -4,6 +4,7 @@ import unittest
 
 from custom_components.bluetti_bt.bluetti_bt_lib.utils.device_builder import build_device
 from custom_components.bluetti_bt.bluetti_bt_lib.devices.ac2a import AC2A
+from custom_components.bluetti_bt.bluetti_bt_lib.devices.ac2p import AC2P
 from custom_components.bluetti_bt.bluetti_bt_lib.devices.ac60 import AC60
 from custom_components.bluetti_bt.bluetti_bt_lib.devices.ac60p import AC60P
 from custom_components.bluetti_bt.bluetti_bt_lib.devices.ac70 import AC70
@@ -40,6 +41,9 @@ class TestDeviceBuilder(unittest.TestCase):
 
     def test_build_ac2a(self):
         self._test_device_build("AC2A56786746478", AC2A)
+
+    def test_build_ac2p(self):
+        self._test_device_build("AC2P56786746478", AC2P)
 
     def test_build_ac60(self):
         self._test_device_build("AC6056786746478", AC60)
