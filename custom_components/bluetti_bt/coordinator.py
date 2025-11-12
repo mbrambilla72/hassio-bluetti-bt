@@ -44,6 +44,7 @@ class PollingCoordinator(DataUpdateCoordinator):
         )
 
         self.address = address
+        self._device_unavailable_logged = False
 
         # Create client
         self.logger.debug("Creating client")
@@ -75,8 +76,14 @@ class PollingCoordinator(DataUpdateCoordinator):
 
         # Check if device is connected
         if bluetooth.async_address_present(self.hass, self.address, connectable=True) is False:
-            self.logger.warning("Device not connected")
+            if not self._device_unavailable_logged:
+                self.logger.warning("Device not connected")
+                self._device_unavailable_logged = True
             self.last_update_success = False
             return None
+        
+        if self._device_unavailable_logged:
+            self.logger.info("Device reconnected and back online")
+            self._device_unavailable_logged = False
 
         return await self.reader.read_data()

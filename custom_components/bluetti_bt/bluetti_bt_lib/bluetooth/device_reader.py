@@ -80,6 +80,21 @@ class DeviceReader:
                     for attempt in range(1, self.max_retries + 1):
                         try:
                             if not self.client.is_connected:
+                                # On reconnect: clear notification handler state
+                                # to avoid stale subscriptions bound to the old connection
+                                try:
+                                    if self.has_notifier:
+                                        await self.client.stop_notify(NOTIFY_UUID)
+                                    await self.client.disconnect()
+                                except:
+                                    pass  # Ignore disconnect cleanup errors
+                                finally:
+                                    # Reset all notification-related state before new connection
+                                    self.has_notifier = False
+                                    self.notify_future = None
+                                    self.current_command = None
+                                    self.notify_response = bytearray()
+
                                 # Use bleak-retry-connector to establish a reliable connection
                                 if self.ble_device is None:
                                     raise BleakError(
@@ -96,9 +111,6 @@ class DeviceReader:
                             if attempt == self.max_retries:
                                 raise e # pass exception on max_retries attempt
                             else:
-                                _LOGGER.warning(
-                                    f"Connect unsucessful (attempt {attempt}): {e}. Retrying..."
-                                )
                                 await asyncio.sleep(2)
 
                     # Attach notifier if needed
@@ -172,8 +184,9 @@ class DeviceReader:
                                 except ParseError:
                                     _LOGGER.warning("Got a parse exception...")
 
-            except TimeoutError as err:
-                _LOGGER.error(f"Polling timed out ({self.polling_timeout}s). Trying again later", exc_info=err)
+
+            except TimeoutError:
+                _LOGGER.warning(f"Polling timed out ({self.polling_timeout}s). Trying again later")                
                 return None
             except BleakError as err:
                 _LOGGER.error("Bleak error: %s", err)

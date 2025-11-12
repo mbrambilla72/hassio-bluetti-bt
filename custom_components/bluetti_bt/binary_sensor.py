@@ -124,6 +124,7 @@ class BluettiBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Handle updated data from the coordinator."""
 
         if self.coordinator.reader.persistent_conn and not self.coordinator.reader.client.is_connected:
+            self._set_unavailable("BLE disconnected")
             return
         
         if self.coordinator.data is None:
@@ -141,9 +142,12 @@ class BluettiBinarySensor(CoordinatorEntity, BinarySensorEntity):
             self._set_unavailable("Invalid data")
             return
 
+        if self._unavailable_counter > 0:
+            self._unavailable_counter = 0
+
         response_data = self.coordinator.data.get(self._response_key)
         if response_data is None:
-            self._set_unavailable("No data")
+            _LOGGER.debug("No data available for (%s)", self._response_key)
             return
 
         if not isinstance(response_data, bool):

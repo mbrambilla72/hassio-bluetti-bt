@@ -118,6 +118,8 @@ class BluettiSwitch(CoordinatorEntity, SwitchEntity):
         """Handle updated data from the coordinator."""
 
         if self.coordinator.reader.persistent_conn and not self.coordinator.reader.client.is_connected:
+            self._attr_available = False
+            self.async_write_ha_state()
             return
 
         _LOGGER.debug("Updating state of %s", unique_id_loggable(self._attr_unique_id))
@@ -131,8 +133,7 @@ class BluettiSwitch(CoordinatorEntity, SwitchEntity):
 
         response_data = self.coordinator.data.get(self._response_key)
         if response_data is None:
-            self._attr_available = False
-            self.async_write_ha_state()
+            _LOGGER.debug("No data available for (%s)", self._response_key)
             return
 
         if not isinstance(response_data, bool):
