@@ -56,6 +56,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN].setdefault(entry.entry_id, {})
     hass.data[DOMAIN][entry.entry_id].setdefault(DATA_POLLING_RUNNING, False)
+    # Register options update listener for automatic reload (no full HA restart needed)
+    entry.async_on_unload(entry.add_update_listener(_update_listener))
 
     # Create coordinator for polling
     _LOGGER.debug("Creating coordinator")
@@ -64,13 +66,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id].setdefault(DATA_COORDINATOR, coordinator)
 
     _LOGGER.debug("Creating entities")
-    platforms: list = PLATFORMS
+    # Build list of platforms to load without mutating global constant
+    load_platforms: list[Platform] = list(PLATFORMS)
     if use_controls is True:
         _LOGGER.warning("You are using controls with this integration at your own risk!")
-        platforms.append(Platform.SWITCH)
+        load_platforms.append(Platform.SWITCH)
+
+    # Remember actually loaded platforms for proper unload
+    hass.data[DOMAIN][entry.entry_id]["platforms"] = load_platforms
 
     # Setup platforms
-    await hass.config_entries.async_forward_entry_setups(entry, platforms)
+    await hass.config_entries.async_forward_entry_setups(entry, load_platforms)
 
     _LOGGER.debug("Setup done")
 
@@ -80,14 +86,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     _LOGGER.debug("Unloading Bluetti BT Integration")
 
-    # Determine which platforms were loaded
-    use_controls = entry.data.get(CONF_USE_CONTROLS)
-    platforms: list = PLATFORMS.copy()
-    if use_controls is True:
-        platforms.append(Platform.SWITCH)
+    # Determine which platforms were loaded (stored during setup)
+    load_platforms: list[Platform] = hass.data[DOMAIN].get(entry.entry_id, {}).get("platforms", list(PLATFORMS))
 
     # Unload platforms
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, platforms)
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, load_platforms)
 
     if unload_ok:
         # Stop coordinator
@@ -127,3 +130,8 @@ def get_unique_id(name: str, sensor_type: str | None = None):
     if sensor_type is not None:
         return f"{sensor_type}.{res}"
     return res
+
+async def _update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle options update by reloading the entry."""
+    _LOGGER.debug("Options updated for entry %s. Reloading integration.", entry.entry_id)
+    await hass.config_entries.async_reload(entry.entry_id)
