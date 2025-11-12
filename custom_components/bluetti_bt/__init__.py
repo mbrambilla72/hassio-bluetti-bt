@@ -71,6 +71,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if use_controls is True:
         _LOGGER.warning("You are using controls with this integration at your own risk!")
         load_platforms.append(Platform.SWITCH)
+        load_platforms.append(Platform.SELECT)
 
     # Remember actually loaded platforms for proper unload
     hass.data[DOMAIN][entry.entry_id]["platforms"] = load_platforms

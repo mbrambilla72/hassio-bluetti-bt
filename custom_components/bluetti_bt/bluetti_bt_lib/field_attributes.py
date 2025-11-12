@@ -10,6 +10,7 @@ from .field_enums import (
     OutputMode,
     SplitPhaseMachineType,
     UpsMode,
+    BatteryState,
 )
 
 
@@ -353,8 +354,14 @@ def PACK_FIELD_ATTRIBUTES(pack: int):
             device_class="battery",
             state_class="measurement",
         ),
-        "pack_bms_version": FieldAttributes(
-            type=FieldType.NUMERIC,
-            name=f"Battery Pack {pack} BMS Version",
+        "pack_battery_state": FieldAttributes(
+            type=FieldType.ENUM,
+            setter=False,
+            name=f"Battery Pack {pack} State",
+            options=BatteryState,
         ),
+        # "pack_bms_version": FieldAttributes(
+        #     type=FieldType.NUMERIC,
+        #     name=f"Battery Pack {pack} BMS Version",
+        # ),
     }

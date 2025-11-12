@@ -54,6 +54,11 @@ class DeviceReader:
 
         self.encryption = BluettiEncryption()
 
+        self.set_pack = 0
+        self.scaned_pack = 0
+        self.skip_pack_count = 0
+        self.packs = {}
+
     async def read_data(
         self, filter_registers: List[ReadHoldingRegisters] | None = None
     ) -> dict | None:
@@ -141,30 +146,19 @@ class DeviceReader:
 
                     # Execute pack polling commands
                     if len(pack_commands) > 0 and len(self.bluetti_device.pack_num_field) == 1:
-                        _LOGGER.debug("Polling battery packs")
-                        for pack in range(1, self.bluetti_device.pack_num_max + 1):
-                            _LOGGER.debug("Setting pack_num to %i", pack)
+                        if self.skip_pack_count > 0:
+                            self.skip_pack_count -= 1                        
+                        elif self.set_pack == self.scaned_pack:
+                            self.skip_pack_count = 1
+                            self.set_pack = self.scaned_pack + 1 if self.scaned_pack < self.bluetti_device.pack_num_max else 1
 
-                            # Set current pack number
                             command = self.bluetti_device.build_setter_command(
-                                "pack_num", pack
+                            "pack_num", self.set_pack
                             )
-                            body = command.parse_response(
-                                await self._async_send_command(command)
-                            )
-                            _LOGGER.debug("Raw data set: %s", body)
+                            await self._async_send_command(command)
+                        else:
+                            pack_temp = {}
 
-                            # Check set pack_num
-                            set_pack = int.from_bytes(body, byteorder='big')
-                            if set_pack is not pack:
-                                _LOGGER.warning("Pack polling failed (pack_num %i doesn't match expected %i)", set_pack, pack)
-                                continue
-
-                            if self.bluetti_device.pack_num_max > 1:
-                                # We need to wait after switching packs 
-                                # for the data to be available
-                                await asyncio.sleep(5)
-                            
                             for command in pack_commands:
                                 # Request & parse result for each pack
                                 try:
@@ -174,16 +168,24 @@ class DeviceReader:
                                     parsed = self.bluetti_device.parse(
                                         command.starting_address, body
                                     )
-                                    _LOGGER.debug("Parsed data: %s", parsed)
 
-                                    for key, value in parsed.items():
-                                        # Ignore likely unavailable pack data
-                                        if value != 0:
-                                            parsed_data.update({key + str(pack): value})
-
+                                    pack_temp.update(parsed)
                                 except ParseError:
                                     _LOGGER.warning("Got a parse exception...")
 
+                            pack_num = pack_temp.get('pack_num_result')
+                            is_pack_disconnected = pack_temp.get('pack_bms_version') == 0
+
+                            if is_pack_disconnected:
+                                pack_temp.update({ 'pack_battery_percent': None })
+
+                            if pack_num == self.set_pack:
+                                self.packs.setdefault(pack_num, {}).update(pack_temp)
+                                self.scaned_pack = pack_num
+                            else:
+                                self.set_pack = 0
+                                self.scaned_pack = 0
+                                self.skip_pack_count = 1
 
             except TimeoutError:
                 _LOGGER.warning(f"Polling timed out ({self.polling_timeout}s). Trying again later")                
@@ -208,6 +210,10 @@ class DeviceReader:
                     self.notify_response = bytearray()    
 
                     await self.client.disconnect()
+
+            for pack_index, pack_data in self.packs.items():
+                for key, value in pack_data.items():
+                    parsed_data.update({key + str(pack_index): value})
 
             # Check if dict is empty
             if not parsed_data:

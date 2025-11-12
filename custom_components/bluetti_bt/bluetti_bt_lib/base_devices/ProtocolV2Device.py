@@ -4,6 +4,7 @@ from typing import List
 
 from ..utils.commands import ReadHoldingRegisters
 from ..utils.struct import DeviceStruct
+from ..field_enums import ChargingMode#, UpsMode
 from .BluettiDevice import BluettiDevice
 
 

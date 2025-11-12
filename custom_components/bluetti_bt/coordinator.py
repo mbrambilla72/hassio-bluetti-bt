@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import asyncio
 
 from bleak import BleakClient
 
@@ -80,6 +81,7 @@ class PollingCoordinator(DataUpdateCoordinator):
                 self.logger.warning("Device not connected")
                 self._device_unavailable_logged = True
             self.last_update_success = False
+            await asyncio.sleep(5)
             return None
         
         if self._device_unavailable_logged:
